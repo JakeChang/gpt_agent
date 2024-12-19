@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "LINE Bot Application",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "start": "node index.js"
   },
@@ -13,6 +14,7 @@
     "@line/bot-sdk": "^7.5.2",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "node-fetch": "^3.3.2",
     "openai": "^4.77.0"
   }
 }

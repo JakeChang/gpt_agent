@@ -1,7 +1,8 @@
-require('dotenv').config();
-const express = require('express');
-const line = require('@line/bot-sdk');
-const OpenAI = require('openai');
+import 'dotenv/config';
+import express from 'express';
+import * as line from '@line/bot-sdk';
+import OpenAI from 'openai';
+import fetch from 'node-fetch';
 
 // LINE 配置
 const config = {
@@ -70,8 +71,24 @@ async function handleEvent(event) {
     }
 }
 
+// 添加一個 GET route 作為健康檢查端點
+app.get('/', (req, res) => {
+    res.send('Bot is running!');
+});
+
+// 添加防止休眠的函數
+function keepAlive() {
+    setInterval(() => {
+        const url = process.env.APP_URL || 'https://gpt-agent-jmu3.onrender.com';
+        fetch(url)
+            .then(response => console.log('防止休眠 Ping 成功:', new Date().toLocaleString('zh-TW')))
+            .catch(error => console.error('防止休眠 Ping 失敗:', error));
+    }, 14 * 60 * 1000); // 每 14 分鐘 ping 一次
+}
+
 // 啟動伺服器
 const port = process.env.PORT || 3000;
 app.listen(port, () => {
     console.log(`機器人伺服器執行於 port ${port}`);
+    keepAlive(); // 啟動防休眠機制
 });
