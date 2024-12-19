@@ -37,23 +37,34 @@ async function handleEvent(event) {
     }
 
     try {
-        // 調用 ChatGPT API
-        const completion = await openai.chat.completions.create({
-            model: "gpt-3.5-turbo",
-            messages: [
-                { role: "user", content: event.message.text }
-            ]
-        });
+        const userMessage = event.message.text;
+        let response;
 
-        // 取得 AI 的回應
-        const aiResponse = completion.choices[0].message.content;
-        
+        // 檢查關鍵字並決定回應
+        if (userMessage.includes('天氣')) {
+            response = '抱歉，我目前無法提供天氣資訊。';
+        }
+        else if (userMessage.includes('時間')) {
+            response = `現在時間是：${new Date().toLocaleString('zh-TW')}`;
+        }
+        else {
+            // 如果沒有匹配的關鍵字，使用 ChatGPT
+            const completion = await openai.chat.completions.create({
+                model: "gpt-3.5-turbo",
+                messages: [
+                    { role: "user", content: userMessage }
+                ]
+            });
+            response = completion.choices[0].message.content;
+        }
+
         // 回覆訊息
-        const reply = { type: 'text', text: aiResponse };
+        const reply = { type: 'text', text: response };
         return client.replyMessage(event.replyToken, reply);
-        
-    } catch (error) {
-        console.error('ChatGPT API 錯誤:', error);
+
+    } 
+    catch (error) {
+        console.error('處理訊息錯誤:', error);
         const errorMessage = { type: 'text', text: '抱歉，我現在無法回應。請稍後再試。' };
         return client.replyMessage(event.replyToken, errorMessage);
     }
