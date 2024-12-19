@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import * as line from '@line/bot-sdk';
-import OpenAI from 'openai';
+import OpenAI from "openai";
 import fetch from 'node-fetch';
 
 // LINE 配置
@@ -43,7 +43,7 @@ async function handleEvent(event) {
 
         // 檢查關鍵字並決定回應
         if (userMessage.includes('天氣')) {
-            response = '抱歉���我目前無法提供天氣資訊。';
+            response = '抱歉，我目前無法提供天氣資訊。';
         }
         else if (userMessage.includes('時間')) {
             response = `現在時間是：${new Date().toLocaleString('zh-TW')}`;
@@ -58,24 +58,23 @@ async function handleEvent(event) {
             response = '最近我一直在幫助更多的人解答問題，學習新的知識，讓自己變得更好！';
         }
         else {
-            //如果沒有匹配的關鍵字，使用 ChatGPT
+            const systemPrompt = "你是一個友善的AI助手。請用簡短、親切的方式回答，並在適當時候使用表情符號。回答時請使用繁體中文。";
             const completion = await openai.chat.completions.create({
-                model: "gpt-3.5-turbo",
+                model: "gpt-4o-mini",
+                store: true,
                 messages: [
-                    { role: "user", content: userMessage }
+                    { "role": "system", "content": systemPrompt },
+                    { "role": "user", "content": userMessage }
                 ]
             });
             response = completion.choices[0].message.content;
-
-            //response = '思考中...';
-
         }
 
         // 回覆訊息
         const reply = { type: 'text', text: response };
         return client.replyMessage(event.replyToken, reply);
 
-    } 
+    }
     catch (error) {
         console.error('處理訊息錯誤:', error);
         const errorMessage = { type: 'text', text: '抱歉，我現在無法回應。請稍後再試。' };
@@ -87,6 +86,27 @@ async function handleEvent(event) {
 app.get('/', (req, res) => {
     res.send('Bot is running!');
 });
+
+// app.get('/test', async (req, res) => {
+//     try {
+//         const completion = await openai.chat.completions.create({
+//             model: "gpt-4o-mini",
+//             store: true,
+//             messages: [
+//                 { "role": "user", "content": "你好安安" }
+//             ]
+//         });
+//         let response = completion.choices[0].message.content;
+//         console.log(response);
+//     }
+//     catch (error) {
+//         console.error('處理訊息錯誤:', error);
+
+
+//     }
+
+//     res.send('test');
+// });
 
 // 添加防止休眠的函數
 function keepAlive() {
