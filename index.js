@@ -43,13 +43,22 @@ async function handleEvent(event) {
 
         // 檢查關鍵字並決定回應
         if (userMessage.includes('天氣')) {
-            response = '抱歉，我目前無法提供天氣資訊。';
+            response = '抱歉���我目前無法提供天氣資訊。';
         }
         else if (userMessage.includes('時間')) {
             response = `現在時間是：${new Date().toLocaleString('zh-TW')}`;
         }
+        else if (userMessage.includes('介紹') || userMessage.includes('自我')) {
+            response = '你好！我是一個 AI 助理，很高興認識你！我喜歡和人聊天，並幫助解決問題。';
+        }
+        else if (userMessage.includes('興趣') || userMessage.includes('喜好')) {
+            response = '作為一個 AI，我最大的興趣是學習新知識和與人交流。我特別喜歡討論科技、藝術和各種有趣的話題！';
+        }
+        else if (userMessage.includes('忙')) {
+            response = '最近我一直在幫助更多的人解答問題，學習新的知識，讓自己變得更好！';
+        }
         else {
-            // 如果沒有匹配的關鍵字，使用 ChatGPT
+            //如果沒有匹配的關鍵字，使用 ChatGPT
             const completion = await openai.chat.completions.create({
                 model: "gpt-3.5-turbo",
                 messages: [
@@ -57,6 +66,9 @@ async function handleEvent(event) {
                 ]
             });
             response = completion.choices[0].message.content;
+
+            //response = '思考中...';
+
         }
 
         // 回覆訊息
