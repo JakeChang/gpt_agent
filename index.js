@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const line = require('@line/bot-sdk');
+const OpenAI = require('openai');
 
 // LINE 配置
 const config = {
@@ -12,6 +13,11 @@ const app = express();
 
 // 建立 LINE client
 const client = new line.Client(config);
+
+// 引入 OpenAI
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY
+});
 
 // 設定 webhook
 app.post('/webhook', line.middleware(config), (req, res) => {
@@ -30,10 +36,27 @@ async function handleEvent(event) {
         return Promise.resolve(null);
     }
 
-    // 回覆收到的訊息
-    const echo = { type: 'text', text: event.message.text };
+    try {
+        // 調用 ChatGPT API
+        const completion = await openai.chat.completions.create({
+            model: "gpt-3.5-turbo",
+            messages: [
+                { role: "user", content: event.message.text }
+            ]
+        });
 
-    return client.replyMessage(event.replyToken, echo);
+        // 取得 AI 的回應
+        const aiResponse = completion.choices[0].message.content;
+        
+        // 回覆訊息
+        const reply = { type: 'text', text: aiResponse };
+        return client.replyMessage(event.replyToken, reply);
+        
+    } catch (error) {
+        console.error('ChatGPT API 錯誤:', error);
+        const errorMessage = { type: 'text', text: '抱歉，我現在無法回應。請稍後再試。' };
+        return client.replyMessage(event.replyToken, errorMessage);
+    }
 }
 
 // 啟動伺服器
