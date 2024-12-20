@@ -58,6 +58,8 @@ async function handleEvent(event) {
         //     response = '最近我一直在幫助更多的人解答問題，學習新的知識，讓自己變得更好！';
         // }
         // else {
+
+        if (userMessage.includes('傑克老師')) {
             const systemPrompt = "你是一個友善的AI助手。請用簡短、親切的方式回答，並在適當時候使用表情符號。回答時請使用繁體中文。";
             const completion = await openai.chat.completions.create({
                 model: "gpt-4o-mini",
@@ -68,13 +70,15 @@ async function handleEvent(event) {
                 ]
             });
             response = completion.choices[0].message.content;
-        // }
 
-        console.log(response);
-        
-        // 回覆訊息
-        const reply = { type: 'text', text: response };
-        return client.replyMessage(event.replyToken, reply);
+            console.log(response);
+
+            // 回覆訊息
+            const reply = { type: 'text', text: response };
+            return client.replyMessage(event.replyToken, reply);
+        }
+
+
 
     }
     catch (error) {
