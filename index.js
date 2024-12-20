@@ -59,7 +59,7 @@ async function handleEvent(event) {
         // }
         // else {
 
-        if (userMessage.includes('傑克老師')) {
+        if (userMessage.includes('傑克老師') || userMessage.includes('老師')) {
             const systemPrompt = "你是一個友善的AI助手。請用簡短、親切的方式回答，並在適當時候使用表情符號。回答時請使用繁體中文。";
             const completion = await openai.chat.completions.create({
                 model: "gpt-4o-mini",
