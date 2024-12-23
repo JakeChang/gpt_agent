@@ -68,15 +68,42 @@ async function handleEvent(event) {
             //     "最近高興的事:ithome鐵人賽獲得2024年佳作，可以分像這個連結https://ithelp.ithome.com.tw/2024ironman/reward" +
             //     "最近不開心的事:沒有";
 
-            const completion = await openai.chat.completions.create({
-                model: "gpt-4o-mini",
-                store: true,
-                messages: [
-                    { "role": "system", "content": "file-MrjDaNcwUzr4dSt3w6k34B" },
-                    { "role": "user", "content": userMessage }
-                ]
+            // const completion = await openai.chat.completions.create({
+            //     model: "gpt-4o-mini",
+            //     store: true,
+            //     messages: [
+            //         //   { "role": "system", "content": storedPrompt },
+            //         { "role": "user", "content": userMessage }
+            //     ]
+            // });
+            // response = completion.choices[0].message.content;
+
+
+            // 建立新的對話串
+            const thread = await openai.beta.threads.create();
+
+            // 添加使用者訊息
+            await openai.beta.threads.messages.create(thread.id, {
+                role: "user",
+                content: "安安你好"
             });
-            response = completion.choices[0].message.content;
+
+            // 執行助手
+            const run = await openai.beta.threads.runs.create(thread.id, {
+                assistant_id: process.env.ASSISTANT_ID
+            });
+
+            // 等待回應
+            let response;
+            while (true) {
+                const runStatus = await openai.beta.threads.runs.retrieve(thread.id, run.id);
+                if (runStatus.status === 'completed') {
+                    const messages = await openai.beta.threads.messages.list(thread.id);
+                    response = messages.data[0].content[0].text.value;
+                    break;
+                }
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
 
             console.log(response);
 
@@ -95,31 +122,58 @@ async function handleEvent(event) {
     }
 }
 
+
+
 // 添加一個 GET route 作為健康檢查端點
 app.get('/', (req, res) => {
     res.send('Bot is running!');
 });
 
-// app.get('/test', async (req, res) => {
-//     try {
-//         const completion = await openai.chat.completions.create({
-//             model: "gpt-4o-mini",
-//             store: true,
-//             messages: [
-//                 { "role": "user", "content": "你好安安" }
-//             ]
-//         });
-//         let response = completion.choices[0].message.content;
-//         console.log(response);
-//     }
-//     catch (error) {
-//         console.error('處理訊息錯誤:', error);
+app.get('/test', async (req, res) => {
+    try {
+        // const completion = await openai.chat.completions.create({
+        //     model: "gpt-4o-mini",
+        //     store: true,
+        //     messages: [
+        //         { "role": "user", "content": "你好安安" }
+        //     ]
+        // });
+        // let response = completion.choices[0].message.content;
+        // console.log(response);
 
+        // 建立新的對話串
+        const thread = await openai.beta.threads.create();
 
-//     }
+        // 添加使用者訊息
+        await openai.beta.threads.messages.create(thread.id, {
+            role: "user",
+            content: "安安你好"
+        });
 
-//     res.send('test');
-// });
+        // 執行助手
+        const run = await openai.beta.threads.runs.create(thread.id, {
+            assistant_id: process.env.ASSISTANT_ID
+        });
+
+        // 等待回應
+        let response;
+        while (true) {
+            const runStatus = await openai.beta.threads.runs.retrieve(thread.id, run.id);
+            if (runStatus.status === 'completed') {
+                const messages = await openai.beta.threads.messages.list(thread.id);
+                response = messages.data[0].content[0].text.value;
+                break;
+            }
+            await new Promise(resolve => setTimeout(resolve, 1000));
+        }
+
+        res.send(response);
+    }
+    catch (error) {
+        console.error('處理訊息錯誤:', error);
+        res.send('test', error);
+    }
+});
 
 // 添加防止休眠的函數
 function keepAlive() {
