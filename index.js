@@ -79,6 +79,9 @@ async function handleEvent(event) {
             // response = completion.choices[0].message.content;
 
 
+            //
+            client.replyMessage(event.replyToken, "正在思考中...");
+
             // 建立新的對話串
             const thread = await openai.beta.threads.create();
 
