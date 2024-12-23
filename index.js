@@ -79,7 +79,7 @@ async function handleEvent(event) {
             // response = completion.choices[0].message.content;
 
 
-            
+
             // 建立新的對話串
             const thread = await openai.beta.threads.create();
 
@@ -95,15 +95,15 @@ async function handleEvent(event) {
 
             // 等待回應
             let response;
-            //while (true) {
+            while (true) {
                 const runStatus = await openai.beta.threads.runs.retrieve(thread.id, run.id);
                 if (runStatus.status === 'completed') {
                     const messages = await openai.beta.threads.messages.list(thread.id);
                     response = messages.data[0].content[0].text.value;
-              //      break;
+                    break;
                 }
-                //await new Promise(resolve => setTimeout(resolve, 1000));
-            //}
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
 
             console.log(response);
 
