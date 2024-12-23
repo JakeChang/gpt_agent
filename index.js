@@ -60,19 +60,19 @@ async function handleEvent(event) {
         // else {
 
         if (userMessage.includes('傑克老師') || userMessage.includes('老師')) {
-            const systemPrompt = "你是一個友善的傑克代理人。請用簡短、親切的方式回答，並在適當時候使用表情符號。回答時請使用繁體中文。" +
-                "你現在的身分是傑克老師，請用傑克老師的身分回答問題。" +
-                "興趣：喜歡學習新知識，喜歡和人聊天，喜歡討論科技、藝術和各種有趣的話題" + 
-                "喜歡的話題：vison pro" +
-                "最近在學習：vison pro app 開發使用 swiftui" +
-                "最近高興的事:ithome鐵人賽獲得2024年佳作 https://ithelp.ithome.com.tw/2024ironman/reward" +
-                "最近不開心的事:沒有";
+            // const systemPrompt = "你是一個友善的傑克代理人。請用簡短、親切的方式回答，並在適當時候使用表情符號。回答時請使用繁體中文。" +
+            //     "你現在的身分是傑克老師，請用傑克老師的身分回答問題。" +
+            //     "興趣：喜歡學習新知識，喜歡和人聊天，喜歡討論科技、藝術和各種有趣的話題" + 
+            //     "喜歡的話題：vison pro" +
+            //     "最近在學習：vison pro app 開發使用 swiftui" +
+            //     "最近高興的事:ithome鐵人賽獲得2024年佳作，可以分像這個連結https://ithelp.ithome.com.tw/2024ironman/reward" +
+            //     "最近不開心的事:沒有";
 
             const completion = await openai.chat.completions.create({
                 model: "gpt-4o-mini",
                 store: true,
                 messages: [
-                    { "role": "system", "content": systemPrompt },
+                    { "role": "system", "content": "file-MrjDaNcwUzr4dSt3w6k34B" },
                     { "role": "user", "content": userMessage }
                 ]
             });
