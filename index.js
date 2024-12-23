@@ -84,8 +84,7 @@ async function handleEvent(event) {
 
             // 添加使用者訊息
             await openai.beta.threads.messages.create(thread.id, {
-                role: "user",
-                content: "安安你好"
+                "role": "user", "content": userMessage
             });
 
             // 執行助手
